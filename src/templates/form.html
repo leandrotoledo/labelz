@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Cadastro de Label - Labelz</title>
+    <link href="css/default.css" rel="stylesheet" type="text/css" >
+</head>
+<body>
+    <form>
+        <label for="label-font"><input type="number" name="label-font" />
+        <label for="label-type">
+            <select name="label-type">
+                {% for option in options %}
+                    <option value="{{option.key}}">{{option.key}}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <input type="file" name="label-upload" />
+    </form>
+</body>
+</html>
