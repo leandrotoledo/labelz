@@ -1,10 +1,27 @@
-from models import Template, Category, Alias, Layout
+from models import Template, Category, Alias, Layout, Paper
 
 from os import listdir
 from os.path import dirname, isfile, join
 from xml.dom.minidom import parseString
 
 GLABELS_TEMPLATES = dirname(__file__) + '/../static/templates' 
+GLABELS_PAPER_SIZE_TEMPLATE = dirname(__file__) + '/../static/paper-sizes.xml'
+
+def parsePaperSizeTemplate():
+    with open(GLABELS_PAPER_SIZE_TEMPLATE, 'r') as xmlfile:
+        data = xmlfile.read()
+        dom = parseString(data)
+        
+        for papersize in dom.getElementsByTagName('Paper-size'):
+            ps = parsePaperSize(papersize)
+            ps = Paper.get_or_insert(ps['id'], **ps)
+            ps.put()
+
+def parsePaperSize(papersize):
+    attrs = { x: papersize.getAttribute(x) for x in ('id', '_name', 'pwg_size', 'width', 'height')}
+    attrs['title'] = attrs.pop('_name')
+     
+    return attrs
 
 def parseTemplates():
     files = [ f for f in listdir(GLABELS_TEMPLATES) if isfile(join(GLABELS_TEMPLATES, f))]
@@ -38,6 +55,7 @@ def parseTemplates():
 def parseTemplate(template): 
     attrs = { x: template.getAttribute(x) for x in ('brand', 'part', 'size', '_description')}
     attrs['description'] = attrs.pop('_description')
+    attrs['size'] = Paper.get_or_insert('size').key
      
     return attrs
 

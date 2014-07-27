@@ -2,7 +2,9 @@ import os
 import webapp2
 import jinja2
 
-from import2 import parseTemplates
+from models import flush
+
+from import2 import parseTemplates, parsePaperSizeTemplate
 
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__) + '/../templates'),
@@ -11,7 +13,9 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        #parseTemplates()
+        #flush()
+        parsePaperSizeTemplate()
+        parseTemplates()
         template = JINJA_ENVIRONMENT.get_template('main.html')
         self.response.write(template.render())
         
