@@ -7,11 +7,10 @@
 </head>
 <body>
     <form>
-        <label for="label-font"><input type="number" name="label-font" />
         <label for="label-type">
             <select name="label-type">
-                {% for option in options %}
-                    <option value="{{option.key.string_id}}">{{option.key.string_id}}</option>
+                {% for template in templates %}
+                    <option value="{{template.key.string_id()}">{{template.key.string_id()|replace("-"," ")}}</option>
                 {% endfor %}
             </select>
         </label>
