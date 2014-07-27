@@ -11,7 +11,7 @@
         <label for="label-type">
             <select name="label-type">
                 {% for option in options %}
-                    <option value="{{option.key}}">{{option.key}}</option>
+                    <option value="{{option.key.string_id}}">{{option.key.string_id}}</option>
                 {% endfor %}
             </select>
         </label>
