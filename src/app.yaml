@@ -1,0 +1,15 @@
+application: labelz
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: .*
+  script: core.views.app
+  
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
