@@ -31,7 +31,7 @@ class CssHandler(webapp2.RequestHandler):
         if t.__class__ == Alias:
             t = Template.query(Template.aliases == t.key).fetch()
         
-        template = JINJA_ENVIRONMENT.get_template('css/default.css')
+        template = JINJA_ENVIRONMENT.get_template('css/template.css')
         self.response.write(template.render({'name': t.key.string_id(),
                                              'width': 100}))
 
