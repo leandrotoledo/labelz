@@ -1,6 +1,26 @@
-* { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
-body { width: {{paperbody}};  }
-.label{ width: {{dx}}; height: {{dy}}; border-radius: {{round}}; -webkit-border-radius: {{round}}; -moz-border-radius: {{round}}; padding: .15in .0937in 0; margin-right: {{spacing}}; float: left; text-align: center; outline: #555 dotted 1px; overflow: hidden;
+* { 
+	-webkit-box-sizing: border-box; 
+	-moz-box-sizing: border-box; 
+	box-sizing: border-box; 
 }
-.page-break  { clear: left; display:block; page-break-after:always;
+
+body { 
+	width: {{ paper_width }};  
+}
+
+.label { 
+	width: {{ dx }}; 
+	height: {{ dy }};  
+	padding: .15in .0937in 0; 
+	/*margin-right: {{ spacing }};*/ 
+	float: left; 
+	text-align: center; 
+	outline: #555 dotted 1px; 
+	overflow: hidden;
+}
+
+.page-break { 
+	clear: left; 
+	display: block; 
+	page-break-after: always;
 }

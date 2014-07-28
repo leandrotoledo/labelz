@@ -50,7 +50,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             template = JINJA_ENVIRONMENT.get_template('labels.html')
             self.response.write(template.render({'key': t.key.string_id(),
                                                  'labels': labels,
-                                                 'labels_per_page': 33}))
+                                                 'labels_per_page': int(t.layouts[0].get().nx * t.layouts[0].get().ny)}))
 
 class CssHandler(webapp2.RequestHandler):
     def get(self, key):
@@ -61,8 +61,11 @@ class CssHandler(webapp2.RequestHandler):
             t = Template.query(Template.aliases == t.key).fetch()
         
         template = JINJA_ENVIRONMENT.get_template('css/template.css')
+        self.response.headers['Content-Type'] = 'text/css'
         self.response.write(template.render({'name': t.key.string_id(),
-                                             'width': 100}))
+                                             'paper_width': t.size.get().width,
+                                             'dx': t.layouts[0].get().dx,
+                                             'dy': t.layouts[0].get().dy,}))
 
 class ImportHandler(webapp2.RequestHandler):
     def get(self):

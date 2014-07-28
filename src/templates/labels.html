@@ -7,8 +7,8 @@
 </head>
 <body id="labels">
 {% for label in labels %}
-	{% if labels.index(label) % 10 == 0 %}
-		OE
+	{% if labels.index(label) != 0 and labels.index(label) % labels_per_page == 0 %}
+		<div class="page-break"></div>
 	{% endif %}
 	
 	<div class="label">{{ label.0 }}</div>
