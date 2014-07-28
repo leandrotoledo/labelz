@@ -34,5 +34,5 @@ class Template(ndb.Model):
 def flush():
     for entry in ('Alias', 'Category', 'Layout', 'Paper', 'Template'):
         query = eval(entry).query()
-        entries = query.fetch(1000)
+        entries = query.fetch()
         ndb.delete_multi([ e.key for e in entries ])
