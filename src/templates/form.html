@@ -1,24 +1,40 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Label Submit - Labelz</title>
-</head>
-<body id="form">
+{% extends "base.html" %}
+{% block title %}CSV Label{% endblock %}
+{% block content %}
+	<h2>CSV Label</h2>
+	
     <form action="{{ upload_url }}" method="post" enctype="multipart/form-data">
-        <label for="label-upload">CSV File
+        <label>CSV File
         	<input type="file" name="label-upload" />
     	</label>
-        <br />
-        <label for="label-type">Layout
+    	
+    	<br />
+        
+		<label>Layout
 	        <select name="label-type">
 	        {% for template in templates %}
 		        <option value="{{template}}">{{template|replace("-"," ")}}</option>
 	        {% endfor %}
 	        </select>
         </label>
-        <br />    	
-        <input type="submit" value="Create Label" />
+
+    	<br />
+        
+        <label>Orientation
+        	<select name="label-orientation">
+        		<option value="normal">Normal</option>
+        		<option value="rotated">Rotated</option>
+        	</select>
+        </label>
+        
+    	<br />
+        
+        <label>Font size
+        	<input type="text" name="label-font-size" value="20" />
+        </label>
+
+    	<br />
+
+        <input type="submit" value="Submit" />
     </form>
-</body>
-</html>
+{% endblock %}

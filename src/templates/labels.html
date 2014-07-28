@@ -1,17 +1,15 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Labelz</title>
-    <link rel="stylesheet" type="text/css" href="/css/{{ key }}.css" />
-</head>
-<body id="labels">
-{% for label in labels %}
-	{% if labels.index(label) != 0 and labels.index(label) % labels_per_page == 0 %}
-		<div class="page-break"></div>
-	{% endif %}
-	
-	<div class="label">{{ label.0 }}</div>
-{% endfor %}
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}CSV Label - Print{% endblock %}
+{% block head %}
+	{{ super() }}
+	<link rel="stylesheet" type="text/css" href="/css/{{ key }}.css" />
+{% endblock %}
+{% block content %}
+	{% for label in labels %}
+		{% if labels.index(label) != 0 and labels.index(label) % labels_per_page == 0 %}
+			<div class="page-break"></div>
+		{% endif %}
+		
+		<div class="label"><span class="{% if label_orientation == "rotated" %} rotated{% endif %}">{{ label.0 }}</span></div>
+	{% endfor %}
+{% endblock %}

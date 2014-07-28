@@ -18,9 +18,8 @@ class MainHandler(webapp2.RequestHandler):
     def get(self):
         upload_url = blobstore.create_upload_url('/upload')
         
-        templates = Template.query().order(Template.key).fetch()
-        aliases = Alias.query().order(Template.key).fetch()
-        templates.extend(aliases)
+        templates, aliases = Template.query().order(Template.key).fetch(), Alias.query().order(Template.key).fetch()
+        #templates.extend(aliases)
         templates = [ t.key.string_id() for t in templates ]
         templates.sort()
         
@@ -36,7 +35,7 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
         if key and csvfile:
             t = Template.get_by_id(key) or Alias.get_by_id(key)
             if t.__class__ == Alias:
-                t = Template.query(Template.aliases == t.key).fetch()
+                t = Template.query(Template.aliases == t.key).fetch()[0]
     
             blob = csvfile[0]
             iterator = BlobIterator(blobstore.BlobReader(blob.key()))
@@ -50,7 +49,11 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
             template = JINJA_ENVIRONMENT.get_template('labels.html')
             self.response.write(template.render({'key': t.key.string_id(),
                                                  'labels': labels,
-                                                 'labels_per_page': int(t.layouts[0].get().nx * t.layouts[0].get().ny)}))
+                                                 'labels_per_page': int(t.layout.get().nx * t.layout.get().ny),
+                                                 'label_orientation': cgi.escape(self.request.get('label-orientation')),
+                                                 'label_font-size:': cgi.escape(self.request.get('label-font-size'))}))
+        else:
+            self.redirect('/') #TODO
 
 class CssHandler(webapp2.RequestHandler):
     def get(self, key):
@@ -58,14 +61,21 @@ class CssHandler(webapp2.RequestHandler):
         
         t = Template.get_by_id(key) or Alias.get_by_id(key)
         if t.__class__ == Alias:
-            t = Template.query(Template.aliases == t.key).fetch()
+            t = Template.query(Template.aliases == t.key).fetch()[0]
         
         template = JINJA_ENVIRONMENT.get_template('css/template.css')
         self.response.headers['Content-Type'] = 'text/css'
         self.response.write(template.render({'name': t.key.string_id(),
-                                             'paper_width': t.size.get().width,
-                                             'dx': t.layouts[0].get().dx,
-                                             'dy': t.layouts[0].get().dy,}))
+                                             'paper_width': t.size[0],
+                                             'left_margin': t.left_margin,
+                                             'top_margin': t.top_margin,
+                                             'label_width': t.label_width - t.label_margin,
+                                             'label_height': t.label_height - t.label_margin,
+                                             'vertical_space': t.vertical_space,
+                                             'horizontal_space': t.horizontal_space,
+                                             'label_margin': t.label_margin,
+                                             'dx': t.layout.get().dx,
+                                             'dy': t.layout.get().dy,}))
 
 class ImportHandler(webapp2.RequestHandler):
     def get(self):

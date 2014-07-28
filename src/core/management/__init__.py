@@ -1,4 +1,4 @@
-from core.models import Template, Category, Alias, Layout, Paper, flush
+from core.models import Template, Alias, Layout, Paper, flush
 
 from os import listdir
 from os.path import dirname, isfile, join
@@ -15,6 +15,25 @@ class GlabelsParser(object):
         flush() # Flush all data
         self.parsePaperSizeTemplate()
         self.parseTemplates()
+    
+    @staticmethod    
+    def toInch(string):
+        if string.endswith('in'): 
+            value = float(string[:-2])
+        elif string.endswith('pt'): 
+            value = float(string[:-2])/72.0
+        elif string.endswith('mm'): 
+            value = float(string[:-2])*0.0393700787
+        elif string.endswith('cm'): 
+            value = float(string[:-2])*0.393700787
+        elif not string:
+            value = 0
+        elif string.replace('.', '').isdigit():
+            value = float(string)/72.0
+        else:
+            print string
+
+        return value
 
     def parsePaperSizeTemplate(self):
         with open(GLABELS_PAPER_SIZE_TEMPLATE, 'r') as xmlfile:
@@ -27,8 +46,9 @@ class GlabelsParser(object):
                 ps.put()
     
     def parsePaperSize(self, papersize):
-        attrs = { x: papersize.getAttribute(x) for x in ('id', '_name', 'pwg_size', 'width', 'height')}
+        attrs = { x: papersize.getAttribute(x) for x in ('id', '_name', 'width', 'height')}
         attrs['title'] = attrs.pop('_name')
+        attrs['width'], attrs['height'] = self.toInch(attrs['width']), self.toInch(attrs['height'])  
          
         return attrs
     
@@ -41,38 +61,29 @@ class GlabelsParser(object):
                 dom = parseString(data)
                 
                 for template in dom.getElementsByTagName('Template'):
+                    if not template.getElementsByTagName('Label-rectangle'):
+                        # round labels, etc.
+                        continue
+                    
                     t = self.parseTemplate(template)
                     t = Template.get_or_insert('-'.join((t['brand'], t['part'])), 
                                                **t)
-                     
-                    for category in [c['title'] for c in self.parseCategory(template)]:
-                        try:
-                            t.categories.append(Category.get_or_insert(category, 
-                                                                       title=category).key)
-                        except ValueError:
-                            pass 
                     
                     for alias in self.parseAlias(template):
                         t.aliases.append(Alias.get_or_insert('-'.join((alias['brand'], alias['part'])),
                                                              **alias).key)
                     
-                    for layout in self.parseLayout(template):
-                        t.layouts.append(Layout(**layout).put())
+                    for layout in self.parseLayout(template): #TOFIX
+                        t.layout = Layout(**layout).put()
                     
                     t.put()
             
     def parseTemplate(self, template): 
         attrs = { x: template.getAttribute(x) for x in ('brand', 'part', 'size', '_description')}
         attrs['description'] = attrs.pop('_description')
-        attrs['size'] = Paper.get_or_insert(attrs['size']).key
+        attrs['paper'] = attrs.pop('size')
+        attrs['paper'] = Paper.get_or_insert(attrs['paper']).key
          
-        return attrs
-    
-    def parseCategory(self, template):
-        attrs = list()
-        for category in template.getElementsByTagName('Meta'):
-            attrs.append({'title': category.getAttribute('category')})
-        
         return attrs
     
     def parseAlias(self, template):
@@ -85,12 +96,30 @@ class GlabelsParser(object):
     def parseLayout(self, template):
         attrs = list()
         for layout in template.getElementsByTagName('Layout'):
-            attrs.append({'nx': int(layout.getAttribute('nx')),
-                          'ny': int(layout.getAttribute('ny')),
-                          'x0': layout.getAttribute('x0'),
-                          'y0': layout.getAttribute('y0'),
-                          'dx': layout.getAttribute('dx'),
-                          'dy': layout.getAttribute('dy')})
+            l = {'nx': int(layout.getAttribute('nx')),
+                 'ny': int(layout.getAttribute('ny')),
+                 'x0': self.toInch(layout.getAttribute('x0')),
+                 'y0': self.toInch(layout.getAttribute('y0')),
+                 'dx': self.toInch(layout.getAttribute('dx')),
+                 'dy': self.toInch(layout.getAttribute('dy'))}
+            
+            try:
+                mm = template.getElementsByTagName('Markup-margin')[0]
+                
+                l.update({'markup_margin': self.toInch(mm.getAttribute('size'))})
+            except IndexError:
+                pass
+            
+            try:
+                lr = template.getElementsByTagName('Label-rectangle')[0]
+                
+                l.update({'width': self.toInch(lr.getAttribute('width')),
+                          'height': self.toInch(lr.getAttribute('height'))})
+            except IndexError:
+                pass
+
+            attrs.append(l)      
+
         return attrs
     
 class BlobIterator:
