@@ -3,14 +3,13 @@
 <head>
     <meta charset="utf-8">
     <title>Label Submit - Labelz</title>
-    <link href="css/default.css" rel="stylesheet" type="text/css" >
 </head>
 <body id="form">
-    <form>
+    <form action="{{ upload_url }}" method="post" enctype="multipart/form-data">
         <label for="label-upload">CSV File
         	<input type="file" name="label-upload" />
     	</label>
-        
+        <br />
         <label for="label-type">Layout
 	        <select name="label-type">
 	        {% for template in templates %}
@@ -18,8 +17,8 @@
 	        {% endfor %}
 	        </select>
         </label>
-            	
-        <button type="submit">Create Label</button>
+        <br />    	
+        <input type="submit" value="Create Label" />
     </form>
 </body>
 </html>

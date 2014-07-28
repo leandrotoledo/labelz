@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Labelz</title>
+    <link rel="stylesheet" type="text/css" href="/css/{{ key }}.css" />
+</head>
+<body id="labels">
+{% for label in labels %}
+	{% if labels.index(label) % 10 == 0 %}
+		OE
+	{% endif %}
+	
+	<div class="label">{{ label.0 }}</div>
+{% endfor %}
+</body>
+</html>
