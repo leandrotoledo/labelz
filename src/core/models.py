@@ -67,6 +67,10 @@ class Template(ndb.Model):
             return 0.05
         return self.layout.get().markup_margin
     
+    @property
+    def label_margin_right(self):
+        return self.layout.get().dx - self.layout.get().width
+    
 def flush():
     for entry in ('Alias', 'Layout', 'Paper', 'Template'):
         query = eval(entry).query()

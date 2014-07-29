@@ -1,28 +1,37 @@
+/* CSS Template for {{ name }} */
+
 body { 
-	width: {{ paper_width }}in;
-	margin: {{ top_margin }}in {{ left_margin }}in;
+	width: {{ paper_width }}in; /* Paper size width */
+	margin: {{ top_margin }}in 0 0 {{ left_margin }}in; /* y0 0 0 x0 */
+	padding: 0;
 }
 
 .label { 
-	background: black;
-	width: {{ label_width }}in; 
-	height: {{ label_height }}in;
-	//margin: {{ vertical_space }}in {{ horizontal_space}}in 0 0;
-	//padding: 0 {{ label_margin }}in;  
-
+	display: table;
+	margin: 0 {{ label_margin_right }}in 0 0; /* dx - width */
 	float: left;
-    text-align: center;
-    overflow: hidden;
-
+	text-align: center;
+	overflow: hidden;
 	outline: 1px dotted;
 }
 
+.label span {
+	width: {{ label_width }}in; /* Label size width */
+	height: {{ label_height }}in; /* Label size height */
+}
+
+.normal {
+	display: table-cell;
+	vertical-align: middle;
+}
+
 .rotated {
-	background: red;
 	float: left;
-	width: {{ label_width }}in;
-	height: {{ label_height }}in;
 	transform: rotate(-90deg);
+}
+
+.barcode {
+	margin: 0 auto;
 }
 
 .page-break { 

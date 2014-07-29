@@ -45,13 +45,15 @@ class UploadHandler(blobstore_handlers.BlobstoreUploadHandler):
                 if row: labels.append(row)
             
             blobstore.delete(blob.key())
-    
+            
             template = JINJA_ENVIRONMENT.get_template('labels.html')
             self.response.write(template.render({'key': t.key.string_id(),
                                                  'labels': labels,
                                                  'labels_per_page': int(t.layout.get().nx * t.layout.get().ny),
+                                                 'label_barcode': cgi.escape(self.request.get('label-barcode')),
                                                  'label_orientation': cgi.escape(self.request.get('label-orientation')),
-                                                 'label_font-size:': cgi.escape(self.request.get('label-font-size'))}))
+                                                 'label_font_size': cgi.escape(self.request.get('label-font-size')),
+                                                 }))
         else:
             self.redirect('/') #TODO
 
@@ -69,13 +71,10 @@ class CssHandler(webapp2.RequestHandler):
                                              'paper_width': t.size[0],
                                              'left_margin': t.left_margin,
                                              'top_margin': t.top_margin,
-                                             'label_width': t.label_width - t.label_margin,
-                                             'label_height': t.label_height - t.label_margin,
-                                             'vertical_space': t.vertical_space,
-                                             'horizontal_space': t.horizontal_space,
-                                             'label_margin': t.label_margin,
-                                             'dx': t.layout.get().dx,
-                                             'dy': t.layout.get().dy,}))
+                                             'label_width': t.label_width,
+                                             'label_height': t.label_height,
+                                             'label_margin_right': t.label_margin_right
+                                             }))
 
 class ImportHandler(webapp2.RequestHandler):
     def get(self):
